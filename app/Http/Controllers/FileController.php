@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FileStoreRequest;
+use App\Models\Right;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\File;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -119,8 +121,12 @@ class FileController extends Controller
 
         // Проверяем права доступа
         $user = auth()->user();
+        $right = Right::where("file_id", "=", $id)
+            ->where("user_id", "=", $user->id)->first();
 
-        if ($user->id != $file->user_id) {
+        // Если обращается не автор файла и нет прав
+        // доступа (не поделились файлом)
+        if ($user->id != $file->user_id && !$right) {
             return response()->json([
                 "message" => "Forbidden fro you"
             ]);
@@ -230,5 +236,80 @@ class FileController extends Controller
             "code" => 200,
             "message" => "File deleted"
         ]);
+    }
+
+    public function owned(Request $request) {
+        // Текущий адрес
+        $protocol = "http" . ($request->secure() ? "s" : "") . "://";
+        $host = $request->getHttpHost();
+
+        $currUser = auth()->user();
+        // Все файлы пользователя из базы
+        $files = File::where("user_id", "=", $currUser->id)->get();
+
+        $response = [];
+
+        foreach ($files as $file) {
+            // Пусть до файла на основе текущего адреса
+            $url = $protocol . $host . "/files/" . $file->id;
+            $access = [[
+                "fullName" => $currUser->first_name,
+                "email" => $currUser->email,
+                "type" => "author"
+            ]];
+
+            $coauthors = Right::where("file_id", "=", $file->id)->get();
+
+            foreach ($coauthors as $coauthor) {
+                $coauthorUser = User::find($coauthor->user_id);
+                array_push($access, [
+                    "fullName" => $coauthorUser->first_name,
+                    "email" => $coauthorUser->email,
+                    "type" => "co-author"
+                ]);
+            }
+            
+            $response[] = [
+                "file_id" => $file->file_id,
+                "name" => $file->name,
+                "code" => 200,
+                "url" => $url,
+                "access" => $access
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    // Вернёт толькол те файлы, к которы пользователь имеет доступ.
+    // Собственные файлы не вернёт, т.к. на свои файлы сами себе права не выдаём
+    // (они и так в файле указаны)
+    public function allowed(Request $request) {
+        // Текущий адрес
+        $protocol = "http" . ($request->secure() ? "s" : "") . "://";
+        $host = $request->getHttpHost();
+
+        $currUser = auth()->user();
+        // Все файлы с доступом у текущего пользователя
+        $rights = Right::where("user_id", "=", $currUser->id)->get();
+
+        $response = [];
+
+        foreach ($rights as $right) {
+            $files = File::where("id", "=", $right->file_id)->get();
+            foreach ($files as $file) {
+                // Пусть до файла на основе текущего адреса
+                $url = $protocol . $host . "/files/" . $file->id;
+            
+                $response[] = [
+                    "file_id" => $file->file_id,
+                    "name" => $file->name,
+                    "code" => 200,
+                    "url" => $url
+                ];
+            }
+        }
+
+        return response()->json($response);
     }
 }
