@@ -105,7 +105,7 @@ class FileController extends Controller
         // Если запись о файле в базе найдена
         if ($file) {
             // Собираем путь до файла
-            $path = $file->path . '/';
+            $path = $file->path;
             $path .= $file->name . '.';
             $path .= $file->extension;
         }
@@ -116,12 +116,12 @@ class FileController extends Controller
             return response()->json([
                 "message" => "Not found",
                 "code"=> 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         // Проверяем права доступа
         $user = auth()->user();
-        $right = Right::where("file_id", "=", $id)
+        $right = Right::where("file_id", "=", $file->id)
             ->where("user_id", "=", $user->id)->first();
 
         // Если обращается не автор файла и нет прав
@@ -129,7 +129,7 @@ class FileController extends Controller
         if ($user->id != $file->user_id && !$right) {
             return response()->json([
                 "message" => "Forbidden for you"
-            ]);
+            ])->setStatusCode(403);
         }
 
         // Отдаём файл на скачивание
@@ -159,7 +159,7 @@ class FileController extends Controller
         // Если запись о файле в базе найдена
         if ($file) {
             // Собираем путь до файла
-            $path = $file->path . '/';
+            $path = $file->path;
             $originalName = $file->name;
             $extension .= "." . $file->extension;
         }
@@ -170,7 +170,7 @@ class FileController extends Controller
             return response()->json([
                 "message" => "Not found",
                 "code"=> 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         // Проверяем права доступа
@@ -179,7 +179,7 @@ class FileController extends Controller
         if ($user->id != $file->user_id) {
             return response()->json([
                 "message" => "Forbidden for you"
-            ]);
+            ])->setStatusCode(403);
         }
 
         // Переименовываем файл
@@ -202,7 +202,7 @@ class FileController extends Controller
         // Если запись о файле в базе найдена
         if ($file) {
             // Собираем путь до файла
-            $path = $file->path . '/';
+            $path = $file->path;
             $path .= $file->name . '.';
             $path .= $file->extension;
         }
@@ -213,7 +213,7 @@ class FileController extends Controller
             return response()->json([
                 "message" => "Not found",
                 "code"=> 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         // Проверяем права доступа
@@ -222,7 +222,7 @@ class FileController extends Controller
         if ($user->id != $file->user_id) {
             return response()->json([
                 "message" => "Forbidden for you"
-            ]);
+            ])->setStatusCode(403);
         }
 
         // Удаляем файл с диска

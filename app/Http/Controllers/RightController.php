@@ -31,7 +31,7 @@ class RightController extends Controller
         // Если запись о файле в базе найдена
         if ($file) {
             // Собираем путь до файла
-            $path = $file->path . '/';
+            $path = $file->path;
             $path .= $file->name . '.';
             $path .= $file->extension;
         }
@@ -42,14 +42,14 @@ class RightController extends Controller
             return response()->json([
                 "message" => "Not found",
                 "code"=> 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         // Проверяем права доступа к файлу
         if ($currUser->id != $file->user_id) {
             return response()->json([
                 "message" => "Forbidden for you"
-            ]);
+            ])->setStatusCode(403);
         }
 
         $newUSer = User::where("email", "=", $request->email)->first();
@@ -59,7 +59,7 @@ class RightController extends Controller
             return response()->json([
                 "message" => "User not found",
                 "code"=> 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         $right = Right::where("user_id", "=", $newUSer->id)
@@ -117,7 +117,7 @@ class RightController extends Controller
         // Если запись о файле в базе найдена
         if ($file) {
             // Собираем путь до файла
-            $path = $file->path . '/';
+            $path = $file->path;
             $path .= $file->name . '.';
             $path .= $file->extension;
         }
@@ -128,14 +128,14 @@ class RightController extends Controller
             return response()->json([
                 "message" => "Not found",
                 "code"=> 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         // Проверяем права доступа к файлу
         if ($currUser->id != $file->user_id) {
             return response()->json([
                 "message" => "Forbidden for you"
-            ]);
+            ])->setStatusCode(403);
         }
 
         $newUSer = User::where("email", "=", $request->email)->first();
@@ -145,7 +145,7 @@ class RightController extends Controller
             return response()->json([
                 "message" => "User not found",
                 "code"=> 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         $right = Right::where("user_id", "=", $newUSer->id)
@@ -158,9 +158,9 @@ class RightController extends Controller
         } else {
             // Иначе выводим ошибку
             return response()->json([
-                "message"=> "Not found",
+                "message"=> "The user no longer has rights",
                 "code" => 404
-            ]);
+            ])->setStatusCode(404);
         }
 
         $allRights = Right::where("file_id", "=", $file->id)->get();
