@@ -112,7 +112,7 @@ class FileController extends Controller
         // то выкидываем ошибку
         if (!$file || !file_exists($path)) {
             return response()->json([
-                "message" => "Not found ",
+                "message" => "Not found",
                 "code"=> 404
             ]);
         }
@@ -186,6 +186,49 @@ class FileController extends Controller
             "success" => true,
             "code" => 200,
             "message" => "Renamed"
+        ]);
+    }
+    public function destroy($id) {
+        // Ищем файл
+        $file = File::where("file_id", "=", $id)->first();
+        $path = "";
+
+        // Если запись о файле в базе найдена
+        if ($file) {
+            // Собираем путь до файла
+            $path = $file->path . '/';
+            $path .= $file->name . '.';
+            $path .= $file->extension;
+        }
+
+        // Если файла нет в базе или на диске,
+        // то выкидываем ошибку
+        if (!$file || !file_exists($path)) {
+            return response()->json([
+                "message" => "Not found",
+                "code"=> 404
+            ]);
+        }
+
+        // Проверяем права доступа
+        $user = auth()->user();
+
+        if ($user->id != $file->user_id) {
+            return response()->json([
+                "message" => "Forbidden fro you"
+            ]);
+        }
+
+        // Удаляем файл с диска
+        unlink($path);
+
+        // Удаляем запись о файле из базы
+        $file->delete();
+
+        return response()->json([
+            "success" => true,
+            "code" => 200,
+            "message" => "File deleted"
         ]);
     }
 }
