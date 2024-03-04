@@ -128,7 +128,7 @@ class FileController extends Controller
         // доступа (не поделились файлом)
         if ($user->id != $file->user_id && !$right) {
             return response()->json([
-                "message" => "Forbidden fro you"
+                "message" => "Forbidden for you"
             ]);
         }
 
@@ -178,7 +178,7 @@ class FileController extends Controller
 
         if ($user->id != $file->user_id) {
             return response()->json([
-                "message" => "Forbidden fro you"
+                "message" => "Forbidden for you"
             ]);
         }
 
@@ -221,7 +221,7 @@ class FileController extends Controller
 
         if ($user->id != $file->user_id) {
             return response()->json([
-                "message" => "Forbidden fro you"
+                "message" => "Forbidden for you"
             ]);
         }
 

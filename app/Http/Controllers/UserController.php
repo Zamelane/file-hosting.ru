@@ -39,17 +39,3 @@ class UserController extends Controller
         $request->user()->forceFill(['remember_token' => ''])->save();
     }
 }
-
-
-/*
- *
-Status: 403
-Content-Type: application/json
-Body:
-{
-   "message": "Login failed"
-}
-
-
-
- * */

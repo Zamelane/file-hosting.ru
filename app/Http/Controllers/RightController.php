@@ -48,7 +48,7 @@ class RightController extends Controller
         // Проверяем права доступа к файлу
         if ($currUser->id != $file->user_id) {
             return response()->json([
-                "message" => "Forbidden fro you"
+                "message" => "Forbidden for you"
             ]);
         }
 
@@ -134,7 +134,7 @@ class RightController extends Controller
         // Проверяем права доступа к файлу
         if ($currUser->id != $file->user_id) {
             return response()->json([
-                "message" => "Forbidden fro you"
+                "message" => "Forbidden for you"
             ]);
         }
 
