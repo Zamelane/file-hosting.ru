@@ -23,7 +23,7 @@ class FileStoreRequest extends ApiRequest
     {
         return [
             'files.*' => 'required|file|max:2048|mimes:doc,pdf,docx,zip,jpeg,jpg,png',
-            'files' => 'required'
+            'files' => 'required|array'
         ];
     }
 }
