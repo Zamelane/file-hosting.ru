@@ -82,7 +82,7 @@ class FileController extends Controller
             }
             
             // Пусть до файла на основе текущего адреса
-            $url = $protocol . $host . "/files/" . $fileId;
+            $url = $protocol . $host . "/api-file/files/" . $fileId;
 
             // Если успешно - сохраняем
             array_push($filesUploaded, [
@@ -251,9 +251,9 @@ class FileController extends Controller
 
         foreach ($files as $file) {
             // Пусть до файла на основе текущего адреса
-            $url = $protocol . $host . "/files/" . $file->id;
+            $url = $protocol . $host . "/api-file/files/" . $file->file_id;
             $access = [[
-                "fullName" => $currUser->first_name,
+                "fullName" => $currUser->first_name . " " . $currUser->last_name,
                 "email" => $currUser->email,
                 "type" => "author"
             ]];
@@ -263,7 +263,7 @@ class FileController extends Controller
             foreach ($coauthors as $coauthor) {
                 $coauthorUser = User::find($coauthor->user_id);
                 array_push($access, [
-                    "fullName" => $coauthorUser->first_name,
+                    "fullName" => $coauthorUser->first_name . " " . $coauthorUser->last_name,
                     "email" => $coauthorUser->email,
                     "type" => "co-author"
                 ]);
@@ -272,6 +272,7 @@ class FileController extends Controller
             $response[] = [
                 "file_id" => $file->file_id,
                 "name" => $file->name,
+                "extension" => $file->extension,
                 "code" => 200,
                 "url" => $url,
                 "access" => $access
@@ -299,7 +300,7 @@ class FileController extends Controller
             $files = File::where("id", "=", $right->file_id)->get();
             foreach ($files as $file) {
                 // Пусть до файла на основе текущего адреса
-                $url = $protocol . $host . "/files/" . $file->id;
+                $url = $protocol . $host . "/files/" . $file->file_id;
             
                 $response[] = [
                     "file_id" => $file->file_id,
