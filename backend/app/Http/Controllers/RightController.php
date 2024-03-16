@@ -76,7 +76,7 @@ class RightController extends Controller
 
         $response = [
             [
-                "firstName" => $currUser->first_name,
+                "fullName" => $currUser->first_name . ' ' . $currUser->last_name,
                 "email" => $currUser->email,
                 "type" => "author",
                 "success" => 200
@@ -86,7 +86,7 @@ class RightController extends Controller
         foreach ($allRights as $right) {
             $user = User::find($right->user_id);
             array_push($response, [
-                "firstName" => $user->first_name,
+                "fullName" => $user->first_name . ' ' . $user->last_name,
                 "email" => $user->email,
                 "type" => "co-author",
                 "success" => 200
@@ -167,7 +167,7 @@ class RightController extends Controller
 
         $response = [
             [
-                "firstName" => $currUser->first_name,
+                "fullName" => $currUser->first_name . ' ' . $currUser->last_name,
                 "email" => $currUser->email,
                 "type" => "author",
                 "success" => 200
@@ -177,7 +177,7 @@ class RightController extends Controller
         foreach ($allRights as $right) {
             $user = User::find($right->user_id);
             array_push($response, [
-                "firstName" => $user->first_name,
+                "fullName" => $user->first_name . ' ' . $user->last_name,
                 "email" => $user->email,
                 "type" => "co-author",
                 "success" => 200

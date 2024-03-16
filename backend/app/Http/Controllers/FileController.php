@@ -82,14 +82,14 @@ class FileController extends Controller
             }
             
             // Пусть до файла на основе текущего адреса
-            $url = $protocol . $host . "/files/" . $fileId;
+            $url = $protocol . $host . "/api-file/files/" . $fileId;
 
             // Если успешно - сохраняем
             array_push($filesUploaded, [
                 "success" => true,
                 "code" => 200,
                 "message" => "success",
-                "name" => $fileName,
+                "name" => $fileName . '.' . $extension,
                 "url" => $url,
                 "file_id" => $fileId,
             ]);
@@ -209,7 +209,7 @@ class FileController extends Controller
 
         // Если файла нет в базе или на диске,
         // то выкидываем ошибку
-        if (!$file || !file_exists($path)) {
+        if (!$file) {
             return response()->json([
                 "message" => "Not found",
                 "code"=> 404
@@ -226,7 +226,9 @@ class FileController extends Controller
         }
 
         // Удаляем файл с диска
-        unlink($path);
+        if (file_exists($path)) {
+            unlink($path);
+        }
 
         // Удаляем запись о файле из базы
         $file->delete();
@@ -251,9 +253,9 @@ class FileController extends Controller
 
         foreach ($files as $file) {
             // Пусть до файла на основе текущего адреса
-            $url = $protocol . $host . "/files/" . $file->id;
+            $url = $protocol . $host . "/api-file/files/" . $file->file_id;
             $access = [[
-                "fullName" => $currUser->first_name,
+                "fullName" => $currUser->first_name . " " . $currUser->last_name,
                 "email" => $currUser->email,
                 "type" => "author"
             ]];
@@ -263,7 +265,7 @@ class FileController extends Controller
             foreach ($coauthors as $coauthor) {
                 $coauthorUser = User::find($coauthor->user_id);
                 array_push($access, [
-                    "fullName" => $coauthorUser->first_name,
+                    "fullName" => $coauthorUser->first_name . " " . $coauthorUser->last_name,
                     "email" => $coauthorUser->email,
                     "type" => "co-author"
                 ]);
@@ -272,6 +274,7 @@ class FileController extends Controller
             $response[] = [
                 "file_id" => $file->file_id,
                 "name" => $file->name,
+                "extension" => $file->extension,
                 "code" => 200,
                 "url" => $url,
                 "access" => $access
@@ -299,11 +302,12 @@ class FileController extends Controller
             $files = File::where("id", "=", $right->file_id)->get();
             foreach ($files as $file) {
                 // Пусть до файла на основе текущего адреса
-                $url = $protocol . $host . "/files/" . $file->id;
+                $url = $protocol . $host . "/api-file/files/" . $file->file_id;
             
                 $response[] = [
                     "file_id" => $file->file_id,
                     "name" => $file->name,
+                    "extension" => $file->extension,
                     "code" => 200,
                     "url" => $url
                 ];
