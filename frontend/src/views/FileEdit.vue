@@ -1,7 +1,14 @@
 <template>
   <p class="fs-2 fw-bold p-3">Редактирование файла</p>
 
-  <router-link to="/myfiles" class="btn btn-primary m-2">← Ко всем файлам</router-link>
+  <div class="container-fluid d-flex">
+    <router-link to="/myfiles" class="btn btn-primary m-2">← Ко всем файлам</router-link>
+    <p class="flex-grow-1"></p>
+    <button to="/myfiles" class="btn btn-danger m-2" @click="deleteFile">
+      <span class="spinner-border spinner-border-sm" aria-hidden="true" :hidden="!isProcessDeleting" />
+      <span role="status" :hidden="isProcessDeleting">Удалить</span>
+    </button>
+  </div>
 
   <div v-if="selectedFile">
     <div class="container-fluid border rounded-top p-4 m-2 d-flex flex-column gap-2">
@@ -84,7 +91,7 @@
     <div class="card-header">Файл не найлен</div>
     <div class="card-body text-danger">
       <h5 class="card-title">Файл с id "{{ fileId }}" не найден</h5>
-      <p class="card-text">Возможно файл был удалён или ошибка в ссылке</p>
+      <p class="card-text">Возможно файл был удалён, у вас нет доступа или ошибка в ссылке</p>
     </div>
   </div>
 
@@ -103,6 +110,7 @@ const { userToken } = authStore
 let files = ref([])
 let selectedFile = ref(null)
 let isProcessLoading = ref(true)
+let isProcessDeleting = ref(false)
 let notFound = ref(false)
 let newName = ref("")
 let processRename = ref(false)
@@ -221,6 +229,28 @@ async function rename() {
   })
     .finally(() => {
       processRename.value = false
+    })
+}
+
+async function deleteFile() {
+  isProcessDeleting.value = true
+  fetch(URL_API + '/api-file/files/' + fileId, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + userToken
+    },
+    body: JSON.stringify({
+      name: newName.value
+    })
+  }).then(async (data) => {
+    const result = await data.json()
+    if (result.code == 200) {
+      router.push({ name: "myfiles" })
+    }
+  })
+    .finally(() => {
+      isProcessDeleting.value = false
     })
 }
 </script>

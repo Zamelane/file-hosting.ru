@@ -22,6 +22,11 @@ const routes = [
         path: 'upload',
         name: 'upload',
         component: () => import('../views/UploadFilesView.vue')
+      },
+      {
+        path: 'sharedme',
+        name: 'sharedme',
+        component: () => import('../views/SharedFilesView.vue')
       }
     ]
   },

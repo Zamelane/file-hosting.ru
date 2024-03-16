@@ -9,24 +9,43 @@
         <li><router-link class="nav-link" to="/myfiles">Мои</router-link></li>
         <li><router-link class="dropdown-item" to="/upload">Загрузить новые</router-link></li>
         <li><hr class="dropdown-divider"></li>
-        <li><a class="dropdown-item" href="#">Со мной поделились</a></li>
+        <li><router-link class="dropdown-item" to="/sharedme">Со мной поделились</router-link></li>
       </ul>
     </li>
     <li class="nav-item auth">
-      <button @click="disauth" class="btn btn-light">Выйти</button>
+      <button @click="disauth" class="btn btn-light">
+        <span class="spinner-border spinner-border-sm" aria-hidden="true" :hidden="!exitProcess" />
+        <span role="status" :hidden="exitProcess">Выйти</span>
+      </button>
     </li>
   </ul>
 </template>
 
 <script setup>
+import { URL_API } from '@/config';
 import router from '@/router';
 import { useAuthStore } from '@/stores/auth';
+import { ref } from 'vue'
 
 const authStore = useAuthStore()
+const { userToken } = authStore
+
+let exitProcess = ref(false)
 
 function disauth() {
-  authStore.clearToken()
-  router.push({ name: 'auth' })
+  exitProcess.value = true
+  fetch(URL_API + '/api-file/logout', {
+    method: 'get',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + userToken
+    }
+  })
+    .finally(() => {
+      exitProcess.value = false
+      authStore.clearToken()
+      router.push({ name: 'auth' })
+    })
 }
 </script>
 

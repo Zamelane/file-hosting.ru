@@ -1,8 +1,8 @@
 <template>
-  <p class="fs-2 fw-bold p-3">Мои файлы</p>
+  <p class="fs-2 fw-bold p-3">Со мной поделились</p>
 
   <p class="fs-4 fw-bold p-3" v-if="!isProcessLoading && !files.length">
-    Файлов нет. Загрузите <router-link :to="{name: 'upload'}">тут</router-link>
+    Файлов нет. С вами никто не поделился :(
   </p>
 
 
@@ -11,7 +11,9 @@
       <div class="card-body d-flex align-items-center">
         <p class="flex-grow-1 mb-0">
           {{ file.name }}
-          <span class="badge text-bg-secondary">{{ file.extension }}</span>
+          <span class="badge text-bg-secondary">
+            {{ file.extension }}
+          </span>
         </p>
         <div class="d-flex gap-2">
 
@@ -19,7 +21,6 @@
             <span class="spinner-border spinner-border-sm" aria-hidden="true" :hidden="!file.isProcess"></span>
             <span role="status" :hidden="file.isProcess">Скачать</span>
           </button>
-          <router-link :to="'myfiles/' + file.file_id" class="btn btn-outline-primary">Подробнее</router-link>
         </div>
       </div>
     </div>
@@ -54,7 +55,7 @@ const { userToken } = authStore
 let files = ref([])
 let isProcessLoading = ref(true)
 
-fetch(URL_API + '/api-file/files/disk', {
+fetch(URL_API + '/api-file/files/shared', {
   method: 'get',
   headers: {
     'Content-Type': 'application/json',

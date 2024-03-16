@@ -89,7 +89,7 @@ class FileController extends Controller
                 "success" => true,
                 "code" => 200,
                 "message" => "success",
-                "name" => $fileName,
+                "name" => $fileName . '.' . $extension,
                 "url" => $url,
                 "file_id" => $fileId,
             ]);
@@ -209,7 +209,7 @@ class FileController extends Controller
 
         // Если файла нет в базе или на диске,
         // то выкидываем ошибку
-        if (!$file || !file_exists($path)) {
+        if (!$file) {
             return response()->json([
                 "message" => "Not found",
                 "code"=> 404
@@ -226,7 +226,9 @@ class FileController extends Controller
         }
 
         // Удаляем файл с диска
-        unlink($path);
+        if (file_exists($path)) {
+            unlink($path);
+        }
 
         // Удаляем запись о файле из базы
         $file->delete();
@@ -300,11 +302,12 @@ class FileController extends Controller
             $files = File::where("id", "=", $right->file_id)->get();
             foreach ($files as $file) {
                 // Пусть до файла на основе текущего адреса
-                $url = $protocol . $host . "/files/" . $file->file_id;
+                $url = $protocol . $host . "/api-file/files/" . $file->file_id;
             
                 $response[] = [
                     "file_id" => $file->file_id,
                     "name" => $file->name,
+                    "extension" => $file->extension,
                     "code" => 200,
                     "url" => $url
                 ];
